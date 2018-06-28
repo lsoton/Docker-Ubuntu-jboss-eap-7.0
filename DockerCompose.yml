@@ -1,6 +1,8 @@
 ubuntu-jboss-eap-7.0:
     image: lsoton/ubuntu-jboss-eap-7.0
-    container_name: jboss-7.0
+    container_name: jboss-QA-7.0-EAP
+    volumes:
+    - '/VARIABLE_ENV:/VARIABLE_ENV'
     ports:
     - '1434:143'
     - '1426:22'
