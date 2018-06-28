@@ -30,20 +30,14 @@ ADD ./jboss-eap-7.0.0.tar.gz /opt
 RUN groupadd -r jboss && useradd -r -g jboss -m -d /opt/EAP-7.0.0 jboss
 
 # Instalar variable EAP 7.0.0.GA
-
 USER jboss
-
 ENV HOME /opt/EAP-7.0.0
-
-#Permiso de ejecucion
-#RUN chmod +x $HOME/EAP-7.0.0/bin/standalone.sh
 
 #Variable entorno
 ENV JBOSS_HOME $HOME
 
 #root
 USER root
-
 ENV HOME /opt/EAP-7.0.0
 ENV JBOSS_HOME $HOME
 
