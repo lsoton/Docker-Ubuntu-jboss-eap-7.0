@@ -54,17 +54,6 @@ RUN chmod +x $HOME/bin/standalone.sh &&\
 RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-amd64" \
     	&& chmod +x /usr/local/bin/gosu
 
-#Add customization sub-directories (for entrypoint)
-#ADD docker-entrypoint-initdb.d  /docker-entrypoint-initdb.d
-#RUN chown -R jboss:jboss        /docker-entrypoint-initdb.d
-#RUN find /docker-entrypoint-initdb.d -type d -execdir chmod 770 {} \;
-#RUN find /docker-entrypoint-initdb.d -type f -execdir chmod 660 {} \;
-
-#ADD modules  $INSTALLDIR/modules
-#RUN chown -R jboss:jboss $INSTALLDIR/modules
-#RUN find $INSTALLDIR/modules -type d -execdir chmod 770 {} \;
-#RUN find $INSTALLDIR/modules -type f -execdir chmod 660 {} \;
-
 # adiciona o java e o jboss no path do S.O
 ENV PATH $PATH:$JAVA_HOME/bin:$JBOSS_HOME/bin
 
