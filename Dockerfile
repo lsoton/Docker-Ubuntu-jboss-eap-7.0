@@ -1,3 +1,6 @@
+#crear contenedor
+#docker build -t lsoton/ubuntu-jboss-eap-7.0 .
+
 FROM ubuntu
 
 MAINTAINER Leonardo Soto, https://github.com/lsoton
