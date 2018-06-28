@@ -5,54 +5,56 @@ MAINTAINER Leonardo Soto, https://github.com/lsoton
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     apt-get install -y net-tools && \
-    apt-get install -y zip unzip && \
+    apt-get install -y zip unzip curl lynx && \
 	apt-get update
 
-#cria a pasta de destino do jdk
-RUN mkdir -p /usr/lib/jvm
+# Instalar Java.
+RUN \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
+	
+# Define  directorio.
+WORKDIR /data
 
-#Adiciona o jdk 7 na pasta tmp (baixe e coloque o arquivo do jdk na mesma pasta deste dockerfile)
-ADD ./jdk-7u80-linux-x64.tar.gz /usr/lib/jvm
+# Define variable JAVA_HOME
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
-#renomeia a pasta do jdk para o nome padrao
-RUN cd /usr/lib/jvm && \
-    mv jdk1.7.0_80 java-7-oracle
+#Jboss eap 7.0 /opt
+ADD ./jboss-eap-7.0.0.tar.gz /opt
 
-# Define a variavel de ambiante do jdk JAVA_HOME
-ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
+# Crear usuario jboss
+RUN groupadd -r jboss && useradd -r -g jboss -m -d /opt/EAP-7.0.0 jboss
 
-#Adiciona o Jboss eap 6.4 na pasta tmp (baixe e coloque o arquivo do jboss na mesma pasta deste dockerfile)
-#ADD ./jboss-eap-7.0.0.tar.gz /tmp
-# Criar usuario do jboss
-RUN groupadd -r jboss && useradd -r -g jboss -m -d /home/jboss jboss
+# Instalar variable EAP 7.0.0.GA
 
-# Instala o EAP 6.4.0.GA
 USER jboss
-ENV HOME /home/jboss
 
-# cria a pasta no diretorio de destino /home/jboss/EAP-7.0.0
-ADD ./jboss-eap-7.0.0.tar.gz /home/jboss/
+ENV HOME /opt/EAP-7.0.0
 
-#RUN mv /tmp/EAP-7.0.0  -d $HOME && \
-#    cd $HOME
-    
-#Da permissão de execusão ao arquivo standalone.sh (talvez desnecessario)
+#Permiso de ejecucion
 #RUN chmod +x $HOME/EAP-7.0.0/bin/standalone.sh
 
-#Adiciona o caminho do jboss ao path de ambiente do sistema
-ENV JBOSS_HOME $HOME/EAP-7.0.0
+#Variable entorno
+ENV JBOSS_HOME $HOME
 
-#altera o usuario para root
+#root
 USER root
 
-#Instala o curl
-RUN apt-get install -y curl
+ENV HOME /opt/EAP-7.0.0
+ENV JBOSS_HOME $HOME
+
+RUN chmod +x $HOME/bin/standalone.sh &&\
+    chown -R jboss:jboss $HOME
 
 #Descompacta o gosu, para execusao em root
 RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-amd64" \
     	&& chmod +x /usr/local/bin/gosu
 
-# Add customization sub-directories (for entrypoint)
+#Add customization sub-directories (for entrypoint)
 #ADD docker-entrypoint-initdb.d  /docker-entrypoint-initdb.d
 #RUN chown -R jboss:jboss        /docker-entrypoint-initdb.d
 #RUN find /docker-entrypoint-initdb.d -type d -execdir chmod 770 {} \;
@@ -66,11 +68,11 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
 # adiciona o java e o jboss no path do S.O
 ENV PATH $PATH:$JAVA_HOME/bin:$JBOSS_HOME/bin
 
-#Pasta de trabalho
-WORKDIR /home/jboss/EAP-7.0.0
+#
+WORKDIR /opt/EAP-7.0.0
 
 # Expor as portas do jboss e outros servicos
-EXPOSE 22 5455 9999 8009 8080 8443 3528 3529 7500 45700 7600 57600 5445 23364 5432 8090 4447 4712 4713 9990 8787:8787
+EXPOSE 22 5455 9999 8009 8080 8443 3528 3529 7500 45700 7600 57600 5445 23364 5432 8090 4447 4712 4713 9990 8787
 
 RUN mkdir /etc/jboss-as
 RUN mkdir /var/log/jboss/
