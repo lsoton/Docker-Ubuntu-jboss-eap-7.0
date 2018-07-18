@@ -1,15 +1,9 @@
 #crear contenedor
 #docker build -t lsoton/ubuntu-jboss-eap-7.0 .
-
-FROM ubuntu
-
-MAINTAINER Leonardo Soto, https://github.com/lsoton
-
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    apt-get install -y net-tools && \
-    apt-get install -y zip unzip curl lynx && \
-	apt-get update
+RUN apt-get update -y && \
+    apt-get install -y software-properties-common --no-install-recommends apt-utils && \
+    apt-get install -y zip unzip curl lynx nano less  && \
+    apt-get update -y
 
 # Instalar Java.
 RUN \
@@ -19,7 +13,7 @@ RUN \
   apt-get install -y oracle-java8-installer && \
   rm -rf /var/lib/apt/lists/* && \
   rm -rf /var/cache/oracle-jdk8-installer
-	
+
 # Define  directorio.
 WORKDIR /data
 
